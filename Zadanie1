@@ -1,0 +1,40 @@
+import java.lang.IllegalArgumentException
+
+fun heron(a: Double, b: Double, c: Double): Double {
+
+    if (a <= 0.0 || b <= 0.0 || c <= 0.0) {
+        throw IllegalArgumentException("Boki muszą być większe niż 0")
+    }
+     if (a + b < c || a + c < b || b + c < a) {
+        throw IllegalArgumentException("Trójkąt o takich bokach nie istnieje")
+    }
+        val p = (a + b + c)/2.0
+        return Math.sqrt(p * (p - a) * (p - b) * (p - c))
+}
+
+fun main(){
+    try {
+        val pole = heron(3.0, 4.0, 6.0)
+        println("Pole trójkąta: $pole")
+    } catch(e: IllegalArgumentException){
+        println(e.message)
+    }
+    try {
+        val pole = heron(0.75, 0.5, 1.2)
+        println("Pole trójkąta: $pole")
+    } catch(e: IllegalArgumentException){
+        println(e.message)
+    }
+    try {
+        val pole = heron(-3.0, 4.0, 6.0)
+        println("Pole trójkąta: $pole")
+    } catch(e: IllegalArgumentException){
+        println(e.message)
+    }
+    try {
+        val pole = heron(13.0, 4.0, 6.0)
+        println("Pole trójkąta: $pole")
+    } catch(e: IllegalArgumentException){
+        println(e.message)
+    }
+}
