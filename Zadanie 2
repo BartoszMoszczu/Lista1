@@ -1,1 +1,47 @@
+//Autor: Bartosz Moszczyńsk
 
+import java.lang.IllegalArgumentException
+
+/**
+ * Funkcja zwracająca części wspólne multizbiorów x i y.
+ *
+ * @param x Pierwsza mapa do porównania.
+ * @param y Druga mapa do porównania.
+ * @return Mapa zawierająca wspólne klucze oraz minimalne wartości z obu map.
+ * @throws IllegalArgumentException Jeśli jedna z map (lub obie) jest równa null.
+ */
+fun <T> wspolne(x: Map<T, Int>?, y: Map<T, Int>?): Map<T, Int> {
+
+    if ( x == null || y == null) {
+        throw IllegalArgumentException("Argumenty nie mogą być null.")
+    }
+
+    val wynik = mutableMapOf<T, Int>()
+    for((klucz, wartosc) in x) {
+        if (y.containsKey(klucz)){
+            wynik[klucz] = Math.min(wartosc, y[klucz]!!)
+        }
+    }
+    return wynik
+}
+
+fun main() {
+    val multizbiorX = mapOf('a' to 4, 'b' to 2, 'c' to 1, 'e' to 6)
+    val multizbiorY = mapOf('a' to 2, 'b' to 2, 'd' to 4, 'c' to 4)
+
+    val czescWspolna = wspolne(multizbiorX, multizbiorY)
+    println(czescWspolna)
+
+
+    try {
+        wspolne(null, multizbiorY)
+    } catch (e: IllegalArgumentException) {
+        println("Błąd: ${e.message}")
+    }
+
+    try {
+        wspolne(multizbiorX, null)
+    } catch (e: IllegalArgumentException) {
+        println("Błąd: ${e.message}")
+    }
+}
