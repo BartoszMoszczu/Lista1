@@ -1,0 +1,36 @@
+// Autor: Bartosz Moszczyński
+
+/**
+ * Funkcja obliczająca ciąg Collatza dla danej liczby naturalnej c0.
+ *
+ * @param c0 Liczba naturalna początkowa.
+ * @return Lista zawierająca kolejne elementy ciągu Collatza aż do wpadnięcia w cykl.
+ */
+fun collatz(c0: Int): List<Int> {
+    require(c0 > 0) { "Parametr c0 musi być liczbą naturalną dodatnią." }
+
+    val sekwencja = mutableListOf<Int>()
+    var cn = c0
+
+    while (cn != 1) {
+        sekwencja.add(cn)
+        cn = if (cn % 2 == 0) {
+            cn/ 2
+        } else {
+            3 * cn + 1
+        }
+    }
+    sekwencja.add(cn) // Dodaj ostatni element (1), gdyż pętla kończy się na 1
+    return sekwencja
+}
+
+fun main() {
+    val testy = listOf(10, 52, 159, 105, 871, 6171)
+
+    for (test in testy) {
+        val sequence = collatz(test)
+        println("Dla c0 = $test: Ciąg = $sequence")
+        println("Maks. wartość = ${sequence.maxOrNull()}")
+        println("Długość ciągu = ${sequence.size}")
+    }
+}
