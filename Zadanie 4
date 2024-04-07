@@ -1,1 +1,50 @@
+// Autor: Bartosz Moszczyński
 
+import java.lang.IllegalArgumentException
+
+/**
+ * Funkcja generująca ciąg Fibonacciego iteracyjnie.
+ *
+ * @param n Liczba elementów ciągu do wygenerowania.
+ * @return Lista zawierająca ciąg Fibonacciego.
+ * @throws IllegalArgumentException Jeśli liczba elementów jest mniejsza lub równa 0.
+ */
+fun fibonacciPetla(n: Int): List<Int> {
+    require(n > 0) { "Liczba elementów musi być większa od zera" }
+
+    val wynik = mutableListOf<Int>()
+    for (i in 0 until n) {
+        if (i == 0 || i == 1) {
+            wynik.add(1)
+        } else {
+            wynik.add(wynik[i - 1] + wynik[i - 2])
+        }
+    }
+    println("Ciąg Fibonacciego wygenerowany funkcją iteracyjną:")
+    return wynik
+}
+
+/**
+ * Funkcja generująca ciąg Fibonacciego rekurencyjnie.
+ *
+ * @param n Liczba elementów ciągu do wygenerowania.
+ * @return Lista zawierająca ciąg Fibonacciego.
+ * @throws IllegalArgumentException Jeśli liczba elementów jest mniejsza lub równa 0.
+ */
+fun fibonacciRekursja(n: Int): List<Int> {
+    require(n > 0) { "Liczba elementów musi być większa od zera" }
+
+    fun fib(n: Int): Int = if (n <= 2)
+        1 else fib(n - 1) + fib(n - 2)
+    println("Ciąg Fibonacciego wygenerowany funkcją rekurencyjną:")
+    return (1..n).map { fib(it) }
+}
+
+fun main() {
+    try {
+        println(fibonacciPetla(n = 10))
+        println(fibonacciRekursja(n = 10))
+    } catch (e: IllegalArgumentException) {
+        println("Błąd: ${e.message}")
+    }
+}
