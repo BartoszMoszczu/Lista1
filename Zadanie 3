@@ -1,0 +1,46 @@
+// Autor: Bartosz Moszczyński
+
+/**
+ * Funkcja generująca wszystkie możliwe podzbiory zbioru.
+ *
+ * @param x Zbiór, dla którego mają być generowane podzbiory.
+ * @return Lista zawierająca wszystkie podzbiory zbioru x.
+ * @throws IllegalArgumentException Jeśli zbiór x jest pusty.
+ */
+fun <T> podzbiory(x: Set<T>): List<Set<T>> {
+    require(x.isNotEmpty()) { "Zbiór x nie może być pusty." }
+
+    return x.fold(listOf(emptySet())) { acc, element ->
+        acc + acc.map { it + element }
+    //zaczerpnięte z tego forum: https://stackoverflow.com/questions/59715608/kotlin-generate-permutations-in-order-of-list-without-duplicate-elements
+    }
+}
+
+/**
+ * Funkcja testująca dla funkcji podzbiory.
+ */
+fun testPodzbiory() {
+    // Test dla poprawnego zbioru
+    val zbior = setOf('a', 'b', 'c', 'd')
+    val wynik = podzbiory(zbior)
+    println("Podzbiory zbioru $zbior:")
+    wynik.forEach { println(it) }
+
+    println()
+
+    // Test dla pustego zbioru
+    try {
+        val pustyZbior = emptySet<Char>()
+        val wynikPustego = podzbiory(pustyZbior)
+        println("Podzbiory zbioru pustego:")
+        wynikPustego.forEach { println(it) }
+    } catch (e: IllegalArgumentException) {
+        println("Błąd: ${e.message}")
+    }
+
+    println()
+}
+
+fun main() {
+    testPodzbiory()
+}
