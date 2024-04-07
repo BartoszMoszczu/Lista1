@@ -1,0 +1,148 @@
+// Autor: Bartosz Moszczyński
+
+import java.lang.IllegalArgumentException
+
+/**
+ * Funkcja generująca komplementarną nić DNA dla danej sekwencji.
+ *
+ * @param sekwencja Początkowa sekwencja DNA.
+ * @return Komplementarna nić DNA.
+ * @throws IllegalArgumentException Jeśli sekwencja zawiera nieprawidłowe znaki.
+ */
+fun dna(sekwencja: String): String {
+    val zamianaKwasów = mapOf('T' to 'A', 'A' to 'T', 'G' to 'C', 'C' to 'G')
+    val matryca = StringBuilder()
+    for (kwasy in sekwencja) {
+        if (kwasy !in zamianaKwasów.keys) {
+            throw IllegalArgumentException("Nieprawidłowa sekwencja DNA.")
+        }
+        val kompl = zamianaKwasów[kwasy]
+        kompl?.let { matryca.append(it) }
+    }
+    return matryca.toString()
+}
+
+/**
+ * Funkcja generująca komplementarną nić mRNA dla danej sekwencji DNA.
+ *
+ * @param matryca Nić DNA komplementarna do podanej nić DNA.
+ * @return Komplementarna nić mRNA.
+ * @throws IllegalArgumentException Jeśli sekwencja zawiera nieprawidłowe znaki.
+ */
+fun rna(matryca: String): String {
+    val transkrypcja = mapOf('A' to 'A', 'T' to 'U', 'C' to 'C', 'G' to 'G')
+    val mrna = StringBuilder()
+    for (kwasy in matryca) {
+        if (kwasy !in transkrypcja.keys) {
+            throw IllegalArgumentException("Nieprawidłowa sekwencja DNA.")
+        }
+        val kompl = transkrypcja[kwasy]
+        kompl?.let { mrna.append(it) }
+    }
+    return mrna.toString()
+}
+
+/**
+ * Funkcja translacji odczytująca aminokwasy z sekwencji mRNA.
+ *
+ * @param mrna Sekwencja mRNA.
+ * @return Identifikator aminokwasu.
+ * @throws IllegalArgumentException Jeśli sekwencja nie jest podzielna przez 3.
+ */
+fun translacja(mrna: String): String {
+    val tablica = mapOf(
+        "AUA" to "I", "AUC" to "I", "AUU" to "I", "AUG" to "M",
+        "ACA" to "T", "ACC" to "T", "ACG" to "T", "ACU" to "T",
+        "AAC" to "N", "AAU" to "N", "AAA" to "K", "AAG" to "K",
+        "AGC" to "S", "AGU" to "S", "AGA" to "R", "AGG" to "R",
+        "CUA" to "L", "CUC" to "L", "CUG" to "L", "CU" to "L",
+        "CCA" to "P", "CCC" to "P", "CCG" to "P", "CCU" to "P",
+        "CAC" to "H", "CAU" to "H", "CAA" to "Q", "CAG" to "Q",
+        "CGA" to "R", "CGC" to "R", "CGG" to "R", "CGU" to "R",
+        "GUA" to "V", "GUC" to "V", "GUG" to "V", "GUU" to "V",
+        "GCA" to "A", "GCC" to "A", "GCG" to "A", "GCU" to "A",
+        "GAC" to "D", "GAU" to "D", "GAA" to "E", "GAG" to "E",
+        "GGA" to "G", "GGC" to "G", "GGG" to "G", "GGU" to "G",
+        "UCA" to "S", "UCC" to "S", "UCG" to "S", "UCU" to "S",
+        "UUC" to "F", "UUU" to "F", "UUA" to "L", "UUG" to "L",
+        "UAC" to "Y", "UAU" to "Y", "UAA" to "_", "UAG" to "_",
+        "UGC" to "C", "UGU" to "C", "UGA" to "_", "UGG" to "W"
+    )
+
+    val aminokwas = StringBuilder()
+    if (mrna.length % 3 == 0) {
+        for (i in 0 until mrna.length step 3) {
+            val kodon = mrna.substring(i, i + 3)
+            if (kodon !in tablica.keys) {
+                throw IllegalArgumentException("Nieprawidłowa sekwencja mRNA.")
+            }
+            val kwas = tablica[kodon]
+            kwas?.let { aminokwas.append(it) }
+        }
+    } else {
+        throw IllegalArgumentException("Nieprawidłowa długość sekwencji mRNA.")
+    }
+    return aminokwas.toString()
+}
+
+fun main() {
+    try {
+        // Testowanie funkcji dna
+        val sekwencja = "AAATTTCCCGGG"
+        println("Nić DNA niekodująca: $sekwencja")
+        val komplementarnaDna = dna(sekwencja)
+        println("Komplementarna nić DNA: $komplementarnaDna")
+
+        // Testowanie funkcji rna
+        val mrna = rna(komplementarnaDna)
+        println("Komplementarna nić mRNA: $mrna")
+
+        // Testowanie funkcji translacja
+        val aminokwasy = translacja(mrna)
+        println("Zakodowane aminokwasy: $aminokwasy")
+        println()
+    } catch (e: IllegalArgumentException) {
+        println("Błąd: ${e.message}")
+        println()
+    }
+
+    try {
+        // Testowanie funkcji dna
+        val sekwencja = "AAATTTCCCGGQ"
+        println("Nić DNA niekodująca: $sekwencja")
+        val komplementarnaDna = dna(sekwencja)
+        println("Komplementarna nić DNA: $komplementarnaDna")
+
+        // Testowanie funkcji rna
+        val mrna = rna(komplementarnaDna)
+        println("Komplementarna nić mRNA: $mrna")
+
+        // Testowanie funkcji translacja
+        val aminokwasy = translacja(mrna)
+        println("Zakodowane aminokwasy: $aminokwasy")
+        println()
+    } catch (e: IllegalArgumentException) {
+        println("Błąd: ${e.message}")
+        println()
+    }
+
+    try {
+        // Testowanie funkcji dna
+        val sekwencja = "AA"
+        println("Nić DNA niekodująca: $sekwencja")
+        val komplementarnaDna = dna(sekwencja)
+        println("Komplementarna nić DNA: $komplementarnaDna")
+
+        // Testowanie funkcji rna
+        val mrna = rna(komplementarnaDna)
+        println("Komplementarna nić mRNA: $mrna")
+
+        // Testowanie funkcji translacja
+        val aminokwasy = translacja(mrna)
+        println("Zakodowane aminokwasy: $aminokwasy")
+        println()
+    } catch (e: IllegalArgumentException) {
+        println("Błąd: ${e.message}")
+        println()
+    }
+}
