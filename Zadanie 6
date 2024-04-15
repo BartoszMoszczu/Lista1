@@ -18,6 +18,16 @@ fun dna(sekwencja: String): String {
         }
         val kompl = zamianaKwasów[kwasy]
         kompl?.let { matryca.append(it) }
+        // let - Wywołuje określony blok funkcyjny z tą wartością jako argumentem i zwraca jego wynik.
+        //źródło: dokumentacja Ktolin https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/let.html
+        // Operator ?. sprawdza, czy wartość obiektu wartosc nie jest null.
+        //Funkcja let zostanie wywołana tylko wtedy, gdy wartosc nie jest null. W takim przypadku zostanie
+    // przekazana wartość wartosc do funkcji let, która może być następnie użyta wewnątrz bloku funkcji let.
+        //Tutaj, jeśli kompl (wartość z mapy zamianaKwasów dla danego kwasu) nie jest null, to append(it) zostanie
+    // wykonane na obiekcie matryca, co pozwala na dodanie odpowiedniego kwasu do sekwencji matrycy.
+    // To samo tyczy się również wywołań funkcji let w innych częściach kodu. Jeśli wartość po sprawdzeniu przez
+    // operator ?. nie jest null, to blok funkcji let zostanie wykonany.
+        // źródło: ChatGPT
     }
     return matryca.toString()
 }
