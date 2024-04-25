@@ -1,0 +1,371 @@
+// Autor: Bartosz Moszczyński
+
+/**
+ * Klasa reprezentująca sekwencję DNA.
+ *
+ * @property identifier unikalny identyfikator sekwencji
+ * @property data ciąg znaków reprezentujący sekwencję DNA
+ */
+class DNASequence(
+    val identifier: String,
+    var data: String
+) {
+    /**
+     * Zbiór dozwolonych znaków w sekwencji DNA.
+     */
+    companion object {
+        private val VALID_CHARS = setOf('A', 'C', 'G', 'T')
+    }
+
+    /**
+     * Długość sekwencji DNA.
+     */
+    val length: Int = data.length
+
+    /**
+     * Metoda zwracająca tekstową reprezentację w formacie FASTA.
+     *
+     * @return tekstowa reprezentacja sekwencji w formacie FASTA
+     */
+    override fun toString(): String {
+        return ">$identifier\n$data"
+    }
+
+    /**
+     * Metoda zmieniająca zasadę na zadanej pozycji w sekwencji DNA.
+     *
+     * @param position pozycja, na której ma nastąpić mutacja
+     * @param value nowa wartość zasady do wstawienia
+     * @throws IllegalArgumentException gdy pozycja jest poza zakresem lub wartość nie jest poprawną zasadą DNA
+     */
+    fun mutate(position: Int, value: Char) {
+        if (position < 0 || position >= length) {
+            throw IllegalArgumentException("Invalid position")
+        }
+        if (!VALID_CHARS.contains(value)) {
+            throw IllegalArgumentException("Invalid DNA base")
+        }
+        // Zamiana znaku na pozycji position
+
+        // Tworzenie nowego ciągu z zastosowaną mutacją
+        val newData = StringBuilder(data)
+        newData.setCharAt(position, value)
+        // Aktualizacja danych sekwencji
+        data = newData.toString()
+    }
+
+    /**
+     * Metoda znajdująca pozycję zadanego motywu w sekwencji DNA.
+     *
+     * @param motif szukany motyw w sekwencji DNA
+     * @return pozycja motywu w sekwencji lub komunikat, jeśli nie został znaleziony
+     */
+    fun findMotif(motif: String): Int {
+        // Użycie indexOf do znalezienia pozycji motywu w sekwencji
+        return data.indexOf(motif)
+    }
+
+    /**
+     * Metoda zwracająca nić komplementarną do sekwencji DNA.
+     *
+     * @return nić komplementarna do sekwencji DNA
+     */
+    fun complement(): String {
+        // Zamiana zasad na komplementarne
+        val complementDNA = mapOf('A' to 'T', 'T' to 'A', 'C' to 'G', 'G' to 'C')
+        return data.map { complementDNA[it] ?: it }.joinToString("")
+    }
+
+    /**
+     * Metoda zwracająca obiekt klasy RNASequence reprezentujący wynik transkrypcji sekwencji DNA.
+     *
+     * @return obiekt reprezentujący transkrypcję sekwencji DNA do RNA
+     */
+    fun transcribe(): RNASequence {
+        // Tworzenie obiektu RNASequence na podstawie sekwencji DNA
+        return RNASequence(identifier, data.replace('T', 'U'))
+    }
+}
+
+/**
+ * Klasa reprezentująca sekwencję RNA.
+ *
+ * @property identifier unikalny identyfikator sekwencji
+ * @property data ciąg znaków reprezentujący sekwencję RNA
+ */
+class RNASequence(
+    val identifier: String,
+    var data: String
+) {
+    /**
+     * Zbiór dozwolonych znaków w sekwencji RNA.
+     */
+    companion object {
+        val VALID_CHARS = setOf('A', 'C', 'G', 'U')
+    }
+
+    /**
+     * Długość sekwencji RNA.
+     */
+    val length: Int = data.length
+
+    /**
+     * Metoda zwracająca tekstową reprezentację w formacie FASTA.
+     *
+     * @return tekstowa reprezentacja sekwencji w formacie FASTA
+     */
+    override fun toString(): String {
+        return ">$identifier\n$data"
+    }
+
+    /**
+     * Metoda zmieniająca zasadę na zadanej pozycji w sekwencji RNA.
+     *
+     * @param position pozycja, na której ma nastąpić mutacja
+     * @param value nowa wartość zasady do wstawienia
+     * @throws IllegalArgumentException gdy pozycja jest poza zakresem lub wartość nie jest poprawną zasadą RNA
+     */
+    fun mutate(position: Int, value: Char) {
+        if (position < 0 || position >= length) {
+            throw IllegalArgumentException("Invalid position")
+        }
+        if (!VALID_CHARS.contains(value)) {
+            throw IllegalArgumentException("Invalid RNA base")
+        }
+        // Tworzenie nowego ciągu z zastosowaną mutacją
+        val newData = StringBuilder(data)
+        newData.setCharAt(position, value)
+        // Aktualizacja danych sekwencji
+        data = newData.toString()
+    }
+
+    /**
+     * Metoda znajdująca pozycję zadanego motywu w sekwencji RNA.
+     *
+     * @param motif szukany motyw w sekwencji RNA
+     * @return pozycja motywu w sekwencji lub komunikat, jeśli nie został znaleziony
+     */
+    fun findMotif(motif: String): Int {
+        // Użycie indexOf do znalezienia pozycji motywu w sekwencji
+        return data.indexOf(motif)
+    }
+
+    /**
+     * Metoda zwracająca nić komplementarną do sekwencji RNA.
+     *
+     * @return nić komplementarna do sekwencji RNA
+     */
+    fun complement(): String {
+        // Zamiana zasad na komplementarne
+        val complementRNA = mapOf('A' to 'U', 'U' to 'A', 'C' to 'G', 'G' to 'C')
+        return data.map { complementRNA[it] ?: it }.joinToString("")
+    }
+
+    /**
+     * Metoda zwracająca obiekt klasy ProteinSequence reprezentujący wynik translacji sekwencji RNA.
+     *
+     * @return obiekt reprezentujący translację sekwencji RNA do sekwencji białkowej
+     */
+    fun transcribe(): ProteinSequence {
+        // Mapowanie kodonów RNA na odpowiadające im aminokwasy
+        val codonToAminoAcid = mapOf(
+            "AUA" to "I", "AUC" to "I", "AUU" to "I", "AUG" to "M",
+            "ACA" to "T", "ACC" to "T", "ACG" to "T", "ACU" to "T",
+            "AAC" to "N", "AAU" to "N", "AAA" to "K", "AAG" to "K",
+            "AGC" to "S", "AGU" to "S", "AGA" to "R", "AGG" to "R",
+            "CUA" to "L", "CUC" to "L", "CUG" to "L", "CUU" to "L",
+            "CCA" to "P", "CCC" to "P", "CCG" to "P", "CCU" to "P",
+            "CAC" to "H", "CAU" to "H", "CAA" to "Q", "CAG" to "Q",
+            "CGA" to "R", "CGC" to "R", "CGG" to "R", "CGU" to "R",
+            "GUA" to "V", "GUC" to "V", "GUG" to "V", "GUU" to "V",
+            "GCA" to "A", "GCC" to "A", "GCG" to "A", "GCU" to "A",
+            "GAC" to "D", "GAU" to "D", "GAA" to "E", "GAG" to "E",
+            "GGA" to "G", "GGC" to "G", "GGG" to "G", "GGU" to "G",
+            "UCA" to "S", "UCC" to "S", "UCG" to "S", "UCU" to "S",
+            "UUC" to "F", "UUU" to "F", "UUA" to "L", "UUG" to "L",
+            "UAC" to "Y", "UAU" to "Y", "UAA" to "_", "UAG" to "_",
+            "UGC" to "C", "UGU" to "C", "UGA" to "_", "UGG" to "W"
+        )
+
+        // Translacja sekwencji RNA na sekwencję białkową
+        val proteinSeqBuilder = StringBuilder()
+        for (i in 0 until data.length step 3) {
+            val codon = data.substring(i, i + 3)
+            val aminoAcid = codonToAminoAcid[codon]
+            if (aminoAcid != null) {
+                proteinSeqBuilder.append(aminoAcid)
+            } else {
+                // Jeśli kodon nie został znaleziony w mapie, użyj domyślnego aminokwasu
+                proteinSeqBuilder.append("X")
+            }
+        }
+
+        return ProteinSequence(identifier, proteinSeqBuilder.toString())
+    }
+}
+
+/**
+ * Klasa reprezentująca sekwencję białkową.
+ *
+ * @property identifier unikalny identyfikator sekwencji
+ * @property aminoacids ciąg znaków reprezentujący sekwencję aminokwasów
+ */
+class ProteinSequence(
+    val identifier: String,
+    var aminoacids: String
+) {
+    /**
+     * Zbiór dozwolonych znaków w sekwencji białka.
+     */
+    companion object {
+        val VALID_CHARS = setOf(
+            'A', 'R', 'N', 'D', 'C', 'Q', 'E', 'G', 'H', 'I',
+            'L', 'K', 'M', 'F', 'P', 'S', 'T', 'W', 'Y', 'V'
+        )
+    }
+
+    /**
+     * Długość sekwencji białkowej.
+     */
+    val length: Int = aminoacids.length
+
+    /**
+     * Metoda zwracająca tekstową reprezentację w formacie FASTA.
+     *
+     * @return tekstowa reprezentacja sekwencji białkowej w formacie FASTA
+     */
+    override fun toString(): String {
+        return ">$identifier\n$aminoacids"
+    }
+
+    /**
+     * Metoda zmieniająca aminokwas na zadanej pozycji w sekwencji białka.
+     *
+     * @param position pozycja, na której ma nastąpić mutacja
+     * @param value nowy aminokwas do wstawienia
+     * @throws IllegalArgumentException gdy pozycja jest poza zakresem lub wartość nie jest poprawnym aminokwasem
+     */
+    fun mutate(position: Int, value: Char) {
+        if (position < 0 || position >= length) {
+            throw IllegalArgumentException("Invalid position")
+        }
+        if (!VALID_CHARS.contains(value)) {
+            throw IllegalArgumentException("Invalid amino acid")
+        }
+        // Tworzenie nowego ciągu z zastosowaną mutacją
+        val newAminoacids = aminoacids.toCharArray()
+        newAminoacids[position] = value
+        // Aktualizacja danych sekwencji białka
+        aminoacids = String(newAminoacids)
+    }
+
+
+    /**
+     * Metoda znajdująca pozycję zadanego motywu w sekwencji białka.
+     *
+     * @param motif szukany motyw w sekwencji białka
+     * @return pozycja motywu w sekwencji lub komunikat, jeśli nie został znaleziony
+     */
+    fun findMotif(motif: String): Int {
+        // Użycie indexOf do znalezienia pozycji motywu w sekwencji
+        return aminoacids.indexOf(motif)
+    }
+}
+
+fun main() {
+    // Tworzenie sekwencji DNA
+    val dnaSeq = DNASequence("DNA_001", "ATCGATCGATCG")
+
+    // Wypisanie sekwencji DNA w formacie FASTA
+    println("DNA Sequence:")
+    println(dnaSeq)
+
+    // Wywołanie metody mutate na sekwencji DNA
+    try {
+        dnaSeq.mutate(5, 'G')
+        println("Mutated DNA Sequence:")
+        println(dnaSeq)
+    } catch (e: IllegalArgumentException) {
+        println("Mutation failed: ${e.message}")
+    }
+
+    // Znalezienie motywu w sekwencji DNA
+    val motifIndex = dnaSeq.findMotif("ATC")
+    if (motifIndex != -1) {
+        println("Motif 'ATC' found at index: $motifIndex")
+    } else {
+        println("Motif 'ATC' not found")
+    }
+
+    // Znaleznienie komplementarnej nici DNA
+    val complementaryDNA = dnaSeq.complement()
+    println("Complementary DNA Sequence:")
+    println(complementaryDNA)
+
+    // Transkrypcja sekwencji DNA na RNA
+    val rnaSeq = dnaSeq.transcribe()
+    println("Transcribed RNA Sequence:")
+    println(rnaSeq)
+    println()
+
+    // Tworzenie sekwencji RNA
+    val rnaSeq2 = RNASequence("RNA_001", "ACGUACGUACGU")
+
+    // Wypisanie sekwencji RNA w formacie FASTA
+    println("RNA Sequence:")
+    println(rnaSeq2)
+
+    // Wywołanie metody mutate na sekwencji RNA
+    try {
+        rnaSeq2.mutate(5, 'G')
+        println("Mutated RNA Sequence:")
+        println(rnaSeq2)
+    } catch (e: IllegalArgumentException) {
+        println("Mutation failed: ${e.message}")
+    }
+
+    // Znalezienie motywu w sekwencji RNA
+    val motifIndexRNA = rnaSeq2.findMotif("ACG")
+    if (motifIndexRNA != -1) {
+        println("Motif 'ACG' found at index: $motifIndexRNA")
+    } else {
+        println("Motif 'ACG' not found")
+    }
+
+    // Znaleznienie komplementarnej nici RNA
+    val complementaryRNA = rnaSeq2.complement()
+    println("Complementary RNA Sequence:")
+    println(complementaryRNA)
+
+    // Tworzenie sekwencji białkowej
+    val proteinSeq = rnaSeq.transcribe()
+
+    // Wypisanie wyniku translacji w formacie FASTA
+    println("Translated Protein Sequence:")
+    println(proteinSeq)
+    println()
+
+    // Tworzenie sekwencji białkowej
+    val proteinSeq2 = ProteinSequence("Protein_001", "MGLRKP")
+
+    // Wypisanie sekwencji białkowej w formacie FASTA
+    println("Protein Sequence:")
+    println(proteinSeq2)
+
+    // Wywołanie metody mutate na sekwencji białkowej
+    try {
+        proteinSeq2.mutate(3, 'Q')
+        println("Mutated Protein Sequence:")
+        println(proteinSeq2)
+    } catch (e: IllegalArgumentException) {
+        println("Mutation failed: ${e.message}")
+    }
+
+    // Znalezienie motywu w sekwencji białkowej
+    val motifIndexProtein = proteinSeq2.findMotif("MX")
+    if (motifIndexProtein != -1) {
+        println("Motif found at index: $motifIndexProtein")
+    } else {
+        println("Motif not found")
+    }
+}
