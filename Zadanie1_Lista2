@@ -1,0 +1,217 @@
+//Autor: Bartosz Moszczyński
+
+/**
+ * Klasa reprezentująca wielomian.
+ * @property wspolczynniki Lista współczynników wielomianu.
+ */
+class Wielomian(private val wspolczynniki: MutableList<Int>) {
+    // Konstruktor klasy Wielomian
+    init {
+        require(wspolczynniki.isNotEmpty()) { "Wielomian musi mieć co najmniej jeden współczynnik" }
+        // Sprawdzanie, czy lista współczynników nie jest pusta
+    }
+    /**
+     * Zwraca stopień wielomianu.
+     * @return Stopień wielomianu.
+     */
+
+    fun stopien(): Int {
+        return wspolczynniki.size - 1
+        // Stopień wielomianu to rozmiar listy współczynników minus 1
+    }
+    /**
+     * Metoda zwracająca tekstową reprezentację wielomianu.
+     * W(x) = aₙxⁿ + aₙ₋₁xⁿ⁻¹ + ... + a₁x + a₀
+     * @return Tekstowa reprezentacja wielomianu.
+     */
+    override fun toString(): String {
+        val builder = StringBuilder("W(x) = ")
+        // Inicjalizacja budowniczego łańcucha znaków z początkowym tekstem "W(x) = "
+
+        for (i in wspolczynniki.indices.reversed()) {
+            // Iteracja od najwyższego do najniższego indeksu listy współczynników
+            if (wspolczynniki[i] != 0) {
+                // Sprawdzenie, czy współczynnik nie jest równy zero
+                if (i < wspolczynniki.size - 1) {
+                    // Sprawdzenie, czy to nie jest pierwszy niezerowy współczynnik
+                    builder.append(" + ")
+                    // Dodanie operatora "+" przed współczynnikiem
+                }
+                builder.append("${wspolczynniki[i]}")
+                // Dodanie współczynnika do łańcucha znaków
+                if (i > 0) {
+                    // Jeśli stopień jest większy niż zero
+                    builder.append("x")
+                    // Dodanie zmiennej x
+                    if (i > 1) {
+                        // Jeśli stopień jest większy niż jeden
+                        builder.append("^$i")
+                        // Dodanie wykładnika stopnia
+                    }
+                }
+            }
+        }
+        return builder.toString()
+        // Zwrócenie tekstowej reprezentacji wielomianu
+    }
+
+    /**
+     * Operator wywołania, oblicza wartość wielomianu dla podanej wartości x.
+     * @param x Wartość, dla której obliczana jest wartość wielomianu.
+     * @return Wartość wielomianu dla x.
+     */
+    operator fun invoke(x: Double): Double {
+        var wynik = 0.0
+        // Zmienna przechowująca obliczoną wartość wielomianu
+        for (i in wspolczynniki.indices) {
+            wynik += wspolczynniki[i] * Math.pow(x, i.toDouble())
+            // Obliczanie wartości wielomianu dla danego stopnia
+        }
+        return wynik
+        // Zwrócenie obliczonej wartości wielomianu
+    }
+
+    /**
+     * Dodaje dwa wielomiany.
+     * @param other Drugi wielomian, który ma zostać dodany.
+     * @return Wynik dodawania dwóch wielomianów.
+     */
+    operator fun plus(other: Wielomian): Wielomian {
+        val maxStopien = maxOf(this.stopien(), other.stopien())
+        // Obliczenie maksymalnego stopnia wielomianu wynikowego
+        val wspSelf = this.wspolczynniki + List(maxStopien - this.stopien()) { 0 }
+        val wspOther = other.wspolczynniki + List(maxStopien - other.stopien()) { 0 }
+        // Dopisanie brakujących zer do współczynników mniejszego stopnia
+        val wspSum = wspSelf.zip(wspOther) { a, b -> a + b }
+        // Dodanie odpowiadających sobie współczynników
+        return Wielomian(wspSum.toMutableList())
+        // Zwrócenie nowego wielomianu
+    }
+
+    /**
+     * Odejmuje dwa wielomiany.
+     * @param other Drugi wielomian, który ma zostać odjęty.
+     * @return Wynik odejmowania dwóch wielomianów.
+     */
+    operator fun minus(other: Wielomian): Wielomian {
+        val maxStopien = maxOf(this.stopien(), other.stopien())
+        // Obliczenie maksymalnego stopnia wielomianu wynikowego
+        val wspSelf = this.wspolczynniki + List(maxStopien - this.stopien()) { 0 }
+        val wspOther = other.wspolczynniki + List(maxStopien - other.stopien()) { 0 }
+        // Dopisanie brakujących zer do współczynników mniejszego stopnia
+        val wspDiff = wspSelf.zip(wspOther) { a, b -> a - b }
+        // Odejmowanie odpowiadających sobie współczynników
+        return Wielomian(wspDiff.toMutableList())
+        // Zwrócenie nowego wielomianu
+    }
+
+    /**
+     * Mnoży dwa wielomiany.
+     * @param other Drugi wielomian, który ma zostać pomnożony.
+     * @return Wynik mnożenia dwóch wielomianów.
+     */
+    operator fun times(other: Wielomian): Wielomian {
+        val resultDegree = this.stopien() + other.stopien()
+        // Obliczenie stopnia wynikowego wielomianu
+        val resultCoeffs = MutableList(resultDegree + 1) { 0 }
+        // Inicjalizacja listy współczynników wynikowego wielomianu
+
+        for (i in wspolczynniki.indices) {
+            for (j in other.wspolczynniki.indices) {
+                resultCoeffs[i + j] += this.wspolczynniki[i] * other.wspolczynniki[j]
+                // Obliczanie współczynnika wynikowego wielomianu
+            }
+        }
+
+        return Wielomian(resultCoeffs)
+        // Zwrócenie nowego wielomianu
+    }
+
+    /**
+     * Operator złożony dodawania (+=) dla wielomianów.
+     * Dodaje drugi wielomian do obecnego.
+     * @param other Drugi wielomian, który ma zostać dodany.
+     */
+    operator fun plusAssign(other: Wielomian) {
+        val maxStopien = maxOf(this.stopien(), other.stopien())
+        // Obliczenie maksymalnego stopnia wielomianu wynikowego
+        val wspOther = other.wspolczynniki + List(maxStopien - other.stopien()) { 0 }
+        for (index in wspolczynniki.indices) {
+            wspolczynniki[index] += wspOther[index]
+            // Dodawanie współczynników do istniejącego wielomianu
+        }
+    }
+
+    /**
+     * Odejmuje drugi wielomian od tego wielomianu (operacja złożona).
+     * @param other Drugi wielomian, który ma zostać odjęty.
+     */
+    operator fun minusAssign(other: Wielomian) {
+        val maxStopien = maxOf(this.stopien(), other.stopien())
+        val wspOther = other.wspolczynniki + List(maxStopien - other.stopien()) { 0 }
+        for (index in wspolczynniki.indices) {
+            wspolczynniki[index] -= wspOther[index]
+        }
+    }
+
+    /**
+     * Operator złożony odejmowania (-=) dla wielomianów.
+     * Odejmuje drugi wielomian od obecnego.
+     * @param other Drugi wielomian, który ma zostać odjęty.
+     */
+    operator fun timesAssign(other: Wielomian) {
+        val resultDegree = this.stopien() + other.stopien()
+        // Obliczenie stopnia wynikowego wielomianu
+        val resultCoeffs = MutableList(resultDegree + 1) { 0 }
+        // Inicjalizacja listy współczynników wynikowego wielomianu
+
+        for (i in wspolczynniki.indices) {
+            for (j in other.wspolczynniki.indices) {
+                resultCoeffs[i + j] += this.wspolczynniki[i] * other.wspolczynniki[j]
+                // Obliczanie współczynnika wynikowego wielomianu
+            }
+        }
+
+        wspolczynniki.clear()
+        wspolczynniki.addAll(resultCoeffs)
+        // Nadpisanie istniejących współczynników wynikowymi współczynnikami
+    }
+}
+
+fun main() {
+    // Tworzenie wielomianu z poprawnymi współczynnikami
+    try {
+        val wspolczynniki = mutableListOf(1, -3, 2, 2) // zmiana na mutableListOf
+        val wspolczynniki2 = mutableListOf(-1, 2, 1) // zmiana na mutableListOf
+        val wielomian = Wielomian(wspolczynniki)
+        val wielomian2 = Wielomian(wspolczynniki2)
+        println("Utworzono wielomian: $wielomian")
+        val x = 2.0 // zmiana na Double
+        val wynik = wielomian(x)
+        println("Wartość wielomianu dla x = $x: $wynik")
+        println("Drugi wieloniam: $wielomian2")
+        val wynik_dodawania = wielomian + wielomian2
+        println("Dodawanie wielomianów: $wynik_dodawania")
+        val wynik_odejmowania = wielomian - wielomian2
+        println("Odejmowanie wielomianów: $wynik_odejmowania")
+        val wynik_mnozenia = wielomian * wielomian2
+        println("Mnożenie wielomianów: $wynik_mnozenia")
+        wielomian += wielomian2
+        println("Operacja +=: $wielomian")
+        wielomian -= wielomian2
+        println("Operacja -=: $wielomian")
+        wielomian *= wielomian2
+        println("Operacja *=: $wielomian")
+    } catch (e: Exception) {
+        println("Wprowadzono nieprawidłowe dane: ${e.message}")
+    }
+
+    // Tworzenie wielomianu z niepoprawnymi współczynnikami (pusta lista)
+    try {
+        val wspolczynniki = mutableListOf<Int>() // zmiana na mutableListOf
+        val wielomian = Wielomian(wspolczynniki)
+        println("Utworzono wielomian: $wielomian")
+    } catch (e: Exception) {
+        println("Wprowadzono nieprawidłowe dane: ${e.message}")
+    }
+}
